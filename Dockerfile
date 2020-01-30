@@ -23,23 +23,25 @@
 # a Docker tag from the string in file container-tag.yaml
 
 #FROM golang:1.12.1 as rtmgrbuild
-FROM nexus3.o-ran-sc.org:10004/bldr-ubuntu18-c-go:3-u18.04-nng as rtmgrbuild
+FROM cachengo/bldr-ubuntu18-c-go-aarch64:3-u18.04-nng as rtmgrbuild
 
 # Install RMr shared library
-RUN wget --content-disposition https://packagecloud.io/o-ran-sc/staging/packages/debian/stretch/rmr_1.10.2_amd64.deb/download.deb && dpkg -i rmr_1.10.2_amd64.deb && rm -rf rmr_1.10.2_amd64.deb
+RUN wget --content-disposition http://artifacts.cachengo.com/ric-deps/rmr_1.10.2_aarch64.deb && dpkg -i rmr_1.10.2_aarch64.deb && rm -rf rmr_1.10.2_aarch64.deb
 # Install RMr development header files
-RUN wget --content-disposition https://packagecloud.io/o-ran-sc/staging/packages/debian/stretch/rmr-dev_1.10.2_amd64.deb/download.deb && dpkg -i rmr-dev_1.10.2_amd64.deb && rm -rf rmr-dev_1.10.2_amd64.deb
+RUN wget --content-disposition http://artifacts.cachengo.com/ric-deps/rmr-dev_1.10.2_aarch64.deb && dpkg -i rmr-dev_1.10.2_aarch64.deb && rm -rf rmr-dev_1.10.2_aarch64.deb
 
 ENV GOLANG_VERSION 1.12.1
-RUN wget --quiet https://dl.google.com/go/go$GOLANG_VERSION.linux-amd64.tar.gz \
-     && tar xvzf go$GOLANG_VERSION.linux-amd64.tar.gz -C /usr/local 
+RUN if test "$(uname -m)" = "aarch64" ; then ARCH="arm64"; else ARCH="amd64"; fi \
+     && wget --quiet https://dl.google.com/go/go$GOLANG_VERSION.linux-$ARCH.tar.gz \
+     && tar xvzf go$GOLANG_VERSION.linux-$ARCH.tar.gz -C /usr/local 
 ENV PATH="/usr/local/go/bin:${PATH}"
-ENV GOPATH /go
+ENV GOPATH /go 
 
 RUN mkdir -p /go/bin
 RUN cd /go/bin \
-    && wget --quiet https://github.com/go-swagger/go-swagger/releases/download/v0.19.0/swagger_linux_amd64 \
-    && mv swagger_linux_amd64 swagger \
+    && if test "$(uname -m)" = "aarch64" ; then ARCH="arm64"; else ARCH="amd64"; fi \
+    && wget --quiet https://github.com/go-swagger/go-swagger/releases/download/v0.19.0/swagger_linux_$ARCH \
+    && mv swagger_linux_$ARCH swagger \
     && chmod +x swagger
 
 
