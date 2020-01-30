@@ -25,15 +25,16 @@ RUN apt-get update \
     && apt-get install -y golang-glide git wget
 
 RUN cd /go/bin \
-    && wget --quiet https://github.com/go-swagger/go-swagger/releases/download/v0.19.0/swagger_linux_amd64 \
-    && mv swagger_linux_amd64 swagger \
+    && if test "$(uname -m)" = "aarch64" ; then ARCH="arm64"; else ARCH="amd64"; fi \
+    && wget --quiet https://github.com/go-swagger/go-swagger/releases/download/v0.19.0/swagger_linux_$ARCH \
+    && mv swagger_linux_$ARCH swagger \
     && chmod +x swagger
 
 COPY . /go/src/routing-manager
 
 WORKDIR /go/src/routing-manager
 
-RUN git clone "https://gerrit.o-ran-sc.org/r/ric-plt/appmgr" \
+RUN git clone -b v0.1.9 "https://gerrit.o-ran-sc.org/r/ric-plt/appmgr" \
     && cp appmgr/api/appmgr_rest_api.yaml api/ \
     && rm -rf appmgr
 
