@@ -35,7 +35,7 @@ COPY api/ /go/src/routing-manager/api
 COPY LICENSE LICENSE
 RUN mkdir pkg
 
-RUN git clone -b v0.1.9 "https://gerrit.o-ran-sc.org/r/ric-plt/appmgr" \
+RUN git clone -b v0.2.0 "https://gerrit.o-ran-sc.org/r/ric-plt/appmgr" \
     && cp appmgr/api/appmgr_rest_api.yaml api/ \
     && rm -rf appmgr
 
